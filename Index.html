@@ -3,12 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Work Update & Report</title>
+  <title>Work Update App - Native Look</title>
+
   <!-- Bootstrap CSS -->
   <link
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
     rel="stylesheet"
   />
+
   <style>
     /* App container */
     body, html {
@@ -16,201 +18,275 @@
       margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
         Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-      background: #f0f2f5;
+      background: #f2f5fa;
     }
     #app {
       max-width: 480px;
       margin: auto;
-      min-height: 100vh;
+      height: 100vh;
       display: flex;
       flex-direction: column;
-      background: white;
-      box-shadow: 0 0 15px rgb(0 0 0 / 0.12);
-      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
+      border-radius: 16px;
       overflow: hidden;
+      padding-bottom: 58px; /* space for footer */
     }
-    header {
+
+    /* Fixed top app bar */
+    header#appBar {
       background-color: #0d6efd;
       color: white;
-      padding: 1.25rem 1rem;
-      text-align: center;
-      font-size: 1.4rem;
+      padding: 1rem 1.25rem;
+      font-size: 1.5rem;
       font-weight: 700;
+      text-align: center;
       user-select: none;
-      box-shadow: 0 2px 6px rgb(0 0 0 / 0.1);
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgb(0 0 0 / 0.15);
     }
+
+    /* Content area scrollable */
     main {
-      flex: 1;
-      padding: 1.25rem 1rem;
+      flex: 1 1 auto;
       overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-    nav {
-      display: flex;
-      border-top: 1px solid #dee2e6;
+      padding: 1rem 1.25rem;
       background: #f8f9fa;
+      position: relative;
     }
-    nav button {
-      flex: 1;
-      font-size: 1.05rem;
-      border: none;
-      padding: 0.75rem 0;
+
+    /* Card for content */
+    .page-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 8px rgb(0 0 0 / 0.06);
+      padding: 1.5rem;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Bottom Tab Bar */
+    nav#bottomNav {
+      position: fixed;
+      bottom: 46px; /* above footer */
+      left: 50%;
+      transform: translateX(-50%);
+      max-width: 480px;
+      width: 100%;
+      background: white;
+      box-shadow: 0 -2px 10px rgb(0 0 0 / 0.1);
+      display: flex;
+      justify-content: space-around;
+      padding: 0.5rem 0;
+      user-select: none;
+      z-index: 1095;
+      border-top-left-radius: 16px;
+      border-top-right-radius: 16px;
+    }
+    nav#bottomNav button {
       background: transparent;
-      color: #495057;
-      font-weight: 600;
+      border: none;
+      flex-grow: 1;
+      font-size: 0.9rem;
+      padding: 0.5rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #6c757d;
       cursor: pointer;
-      transition: background-color 0.25s ease, color 0.25s ease;
+      transition: color 0.3s ease;
     }
-    nav button:hover:not(.active) {
-      background-color: #e2e6ea;
+    nav#bottomNav button svg {
+      width: 24px;
+      height: 24px;
+      margin-bottom: 0.25rem;
+      stroke-width: 1.5;
     }
-    nav button.active {
-      background: #0d6efd;
-      color: white;
-      box-shadow: inset 0 -3px 0 #0a58ca;
-      border-radius: 0;
+    nav#bottomNav button.active,
+    nav#bottomNav button:hover {
+      color: #0d6efd;
     }
-    /* Button full width & spacing */
-    .btn-primary, .btn-success, .btn-info, .btn-outline-primary {
+
+    /* Hide pages by default */
+    section.page {
+      display: none;
+      flex: 1 1 auto;
+    }
+    section.page.active {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Buttons full width and spaced nicely */
+    .btn-primary, .btn-success, .btn-outline-info {
       width: 100%;
       font-size: 1.15rem;
       padding: 1rem 0.5rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgb(13 110 253 / 0.3);
     }
-    /* Report page styling */
+
+    /* Scrollable report area */
     #reportArea {
-      max-height: 50vh;
+      flex: 1 1 auto;
       overflow-y: auto;
       margin-top: 1rem;
     }
-    .form-label {
-      font-weight: 600;
+
+    /* Month-Year Menu Bar inside report */
+    #monthYearMenuBar {
+      background-color: #f8f9fa;
+      margin-top: 1rem;
     }
-    /* Step headings */
-    h5 {
-      font-weight: 700;
-      margin-bottom: 1rem;
-      color: #212529;
-      text-align: center;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-    /* Container for month-year buttons */
     #buttonContainer {
       display: flex;
-      flex-wrap: wrap;
       gap: 0.5rem;
-      margin-top: 1rem;
-      justify-content: center;
-    }
-    #buttonContainer button {
-      flex-grow: 1;
-      flex-basis: 48%;
-      font-size: 1rem;
-      padding: 0.65rem 0;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+      -webkit-overflow-scrolling: touch;
       white-space: nowrap;
     }
-    /* CSV uploader section */
-    #csvUploader {
-      background: #e9ecef;
-      border-radius: 8px;
-      padding: 1rem;
-      box-shadow: inset 0 0 6px rgb(0 0 0 / 0.05);
+    #buttonContainer button {
+      flex-grow: 0 !important;
+      flex-basis: auto !important;
+      display: inline-block;
+      min-width: 100px;
+      white-space: nowrap;
     }
-    /* Space below buttons */
-    #processBtn {
-      margin-bottom: 1rem;
+
+    /* Footer styles */
+    #footerBar {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      max-width: 480px;
+      width: 100%;
+      height: 46px;
+      background: #0d6efd;
+      color: #fff;
+      font-size: 0.96rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 -2px 10px rgb(0 0 0 / 0.12);
+      z-index: 1100;
+      border-bottom-left-radius: 16px;
+      border-bottom-right-radius: 16px;
+      user-select: none;
     }
-    /* Source data button */
-    #viewSourceBtn {
-      margin-top: 0.5rem;
-    }
+
     /* Responsive tweaks */
     @media (max-width: 360px) {
-      #buttonContainer button {
-        flex-basis: 100%;
+      .page-card {
+        padding: 1rem;
       }
     }
   </style>
 </head>
 <body>
   <div id="app" role="main" aria-label="Work Update and Report Application">
-    <header>Work Update App</header>
+
+    <header id="appBar" role="banner">
+      Work Update App
+    </header>
 
     <main>
       <!-- Add Work Update Page -->
-      <section id="page-add" class="page" tabindex="0">
-        <a
-          href="https://forms.gle/8TbY5fmMs9rPeiQx7"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="btn btn-primary"
-          aria-label="Open form to add work update"
-          >➕ Add Work Update</a
-        >
+      <section id="page-add" class="page active" tabindex="0" role="region" aria-label="Add Work Update">
+        <div class="page-card">
+          <a
+            href="https://forms.gle/8TbY5fmMs9rPeiQx7"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn btn-primary"
+            aria-label="Open form to add work update"
+            >➕ Add Work Update</a>
+        </div>
       </section>
 
       <!-- Generate Report Page -->
-      <section id="page-report" class="page" style="display:none;" tabindex="0" aria-live="polite">
-        <div id="csvUploader" aria-label="CSV Report Upload Section">
-          <h5>Step 1: Download & Upload CSV Report</h5>
+      <section id="page-report" class="page" tabindex="0" role="region" aria-label="Generate Report">
+        <div class="page-card d-flex flex-column">
+          <div id="csvUploader" aria-label="CSV Report Upload Section">
+            <h5 class="text-center fw-bold mb-3">Step 1: Download & Upload CSV Report</h5>
 
-          <div class="mb-3">
-            <a
-              href="https://docs.google.com/spreadsheets/d/e/2PACX-1vSIamlRZC480-QO7RE9zzhODFeMoEPMg4gZhjGCUUxhXZ_RRlfeffk66K7UBxNUATNPWV20hD8WJKMQ/pub?gid=1006678844&single=true&output=csv"
-              target="_blank"
-              class="btn btn-primary"
-              aria-label="Download CSV report"
-              >📥 Download CSV</a
-            >
-          </div>
-
-          <div class="mb-3">
-            <label for="csvFile" class="form-label">Upload Downloaded CSV File:</label>
-            <input
-              type="file"
-              id="csvFile"
-              accept=".csv"
-              class="form-control"
-              aria-required="true"
-              aria-describedby="csvFileHelp"
-            />
-            <div id="csvFileHelp" class="form-text">
-              Please upload the CSV file you downloaded above.
+            <div class="mb-3">
+              <a
+                href="https://docs.google.com/spreadsheets/d/e/2PACX-1vSIamlRZC480-QO7RE9zzhODFeMoEPMg4gZhjGCUUxhXZ_RRlfeffk66K7UBxNUATNPWV20hD8WJKMQ/pub?gid=1006678844&single=true&output=csv"
+                target="_blank"
+                class="btn btn-primary"
+                aria-label="Download CSV report"
+                >📥 Download CSV</a>
             </div>
+
+            <div class="mb-3">
+              <label for="csvFile" class="form-label fw-semibold">Upload Downloaded CSV File:</label>
+              <input
+                type="file"
+                id="csvFile"
+                accept=".csv"
+                class="form-control"
+                aria-required="true"
+                aria-describedby="csvFileHelp"
+              />
+              <div id="csvFileHelp" class="form-text">
+                Please upload the CSV file you downloaded above.
+              </div>
+            </div>
+
+            <button id="processBtn" class="btn btn-success mb-3">✅ Next: Process File</button>
+
+            <a
+              href="https://docs.google.com/spreadsheets/d/1coypbNfY9aaIx8dgJJhRU60q82IwjG-IMal531Q39RY/edit?usp=sharing"
+              target="_blank"
+              rel="noopener noreferrer"
+              id="viewSourceBtn"
+              class="btn btn-outline-info"
+              aria-label="View source data in Google Sheets"
+              >👁️ View Source Data</a>
           </div>
 
-          <button id="processBtn" class="btn btn-success">✅ Next: Process File</button>
+          <!-- Month-Year buttons moved here as a horizontal scrollable bar -->
+          <nav id="monthYearMenuBar" aria-label="Month and Year Report Selection">
+            <div id="buttonContainer" role="list"></div>
+          </nav>
 
-          <a
-            href="https://docs.google.com/spreadsheets/d/1coypbNfY9aaIx8dgJJhRU60q82IwjG-IMal531Q39RY/edit?usp=sharing"
-            target="_blank"
-            rel="noopener noreferrer"
-            id="viewSourceBtn"
-            class="btn btn-outline-info"
-            aria-label="View source data in Google Sheets"
-            >👁️ View Source Data</a
-          >
+          <div id="reportArea" aria-live="polite" aria-atomic="true" class="mt-3 flex-grow-1"></div>
         </div>
-
-        <hr class="my-4" />
-
-        <div aria-label="Step 2: Download Report by Month-Year" class="text-center">
-          <h5>Step 2: Download Report by Month-Year</h5>
-          <div id="buttonContainer" class="d-flex flex-wrap gap-2 justify-content-center mt-3" role="list"></div>
-        </div>
-
-        <div id="reportArea" aria-live="polite" aria-atomic="true"></div>
       </section>
     </main>
 
-    <nav aria-label="Main navigation">
-      <button id="btnAdd" class="active" aria-current="page" aria-label="Navigate to Add Work Update page">Add Work Update</button>
-      <button id="btnReport" aria-label="Navigate to Generate Report page">Generate Report</button>
+    <!-- Bottom Tab Bar -->
+    <nav id="bottomNav" role="navigation" aria-label="Primary">
+      <button id="btnAdd" class="active" aria-current="page" aria-label="Navigate to Add Work Update page" type="button">
+        <svg stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+        Add
+      </button>
+      <button id="btnReport" aria-label="Navigate to Generate Report page" type="button">
+        <svg stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="16" x2="12" y2="12" />
+          <line x1="12" y1="8" x2="12" y2="8" />
+        </svg>
+        Report
+      </button>
     </nav>
+
+    <!-- Fixed Footer -->
+    <footer id="footerBar" role="contentinfo">
+      © 2025 Riju Karmakar — All rights reserved
+    </footer>
+
   </div>
 
   <!-- Bootstrap JS bundle -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <!-- External libraries for CSV parsing and PDF generation -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -228,23 +304,22 @@
       const buttonContainer = document.getElementById("buttonContainer");
       const reportArea = document.getElementById("reportArea");
 
-      // Navigation handlers
       btnAdd.addEventListener("click", () => showPage("add"));
       btnReport.addEventListener("click", () => showPage("report"));
 
       function showPage(page) {
         if (page === "add") {
-          pageAdd.style.display = "block";
+          pageAdd.classList.add("active");
           pageAdd.focus();
-          pageReport.style.display = "none";
+          pageReport.classList.remove("active");
           btnAdd.classList.add("active");
           btnAdd.setAttribute("aria-current", "page");
           btnReport.classList.remove("active");
           btnReport.removeAttribute("aria-current");
           clearReportSection();
         } else if (page === "report") {
-          pageAdd.style.display = "none";
-          pageReport.style.display = "block";
+          pageAdd.classList.remove("active");
+          pageReport.classList.add("active");
           pageReport.focus();
           btnReport.classList.add("active");
           btnReport.setAttribute("aria-current", "page");
@@ -253,14 +328,12 @@
         }
       }
 
-      // Clears report page state when switching to Add page
       function clearReportSection() {
         buttonContainer.innerHTML = "";
         reportArea.innerHTML = "";
         csvFileInput.value = "";
       }
 
-      // Global variable for parsed CSV data
       let globalData = [];
 
       processBtn.addEventListener("click", () => {
@@ -293,7 +366,6 @@
         });
       });
 
-      // Generate buttons for each distinct Month-Year
       function populateMonthButtons() {
         const monthYearSet = new Set();
 
@@ -327,7 +399,6 @@
         alert(`🎉 Generated buttons for ${monthYearSet.size} month(s).`);
       }
 
-      // Generates PDF report for filtered data
       async function generatePDF(filteredData, selectedMonthYear) {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF({
@@ -338,7 +409,6 @@
 
         const pageWidth = doc.internal.pageSize.getWidth();
 
-        // Title and Subtitle Centered
         doc.setFontSize(12);
         doc.setFont("helvetica", "bold");
         const title = "MANBHUM ANANDA ASHRAM NITYANANDA TRUST";
@@ -346,18 +416,15 @@
         doc.text(title, pageWidth / 2, 15, { align: "center" });
         doc.text(subtitle, pageWidth / 2, 22, { align: "center" });
 
-        // Horizontal Line
         doc.setLineWidth(0.3);
         doc.line(10, 26, pageWidth - 10, 26);
 
-        // Month Centered
         doc.setFont("helvetica", "normal");
         doc.setFontSize(11);
         doc.text(`For the month of ${selectedMonthYear}`, pageWidth / 2, 33, {
           align: "center",
         });
 
-        // Name left and Designation right
         doc.setFontSize(10);
         doc.text("Name: Toton Shit", 10, 40);
         doc.text(
@@ -367,7 +434,6 @@
           { align: "right" }
         );
 
-        // Table headers
         const headers = [
           [
             "Sl",
@@ -380,7 +446,6 @@
           ],
         ];
 
-        // Table rows
         const rows = filteredData.map((row, index) => [
           index + 1,
           row["Date of Visit"] || "",
@@ -419,12 +484,11 @@
 
         doc.save(`Travel_Report_${selectedMonthYear}.pdf`);
 
-        // Update reportArea with confirmation
         reportArea.innerHTML = `<div class="alert alert-success" role="alert">✅ PDF generated for <strong>${selectedMonthYear}</strong>. Check your downloads.</div>`;
         reportArea.focus();
       }
 
-      // Initialize app on load
+      // Initialize
       showPage("add");
     })();
   </script>
