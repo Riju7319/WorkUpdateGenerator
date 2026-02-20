@@ -1,496 +1,926 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Work Update App - Native Look</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Work Update App</title>
 
-  <!-- Bootstrap CSS -->
-  <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-    rel="stylesheet"
-  />
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
 
   <style>
-    /* App container */
-    body, html {
-      height: 100%;
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-        Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-      background: #f2f5fa;
+    /* ── DESIGN TOKENS ─────────────────────────────────── */
+    :root {
+      --brand: #4f46e5;
+      --brand-dark: #3730a3;
+      --brand-light: #818cf8;
+      --accent: #06b6d4;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warn: #f59e0b;
+      --bg: #f1f5f9;
+      --surface: #ffffff;
+      --surface2: #f8fafc;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --radius-sm: 10px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --shadow-sm: 0 1px 4px rgba(0, 0, 0, .08);
+      --shadow-md: 0 4px 16px rgba(79, 70, 229, .12);
+      --shadow-lg: 0 8px 32px rgba(79, 70, 229, .18);
+      --nav-h: 66px;
+      --footer-h: 36px;
+      --header-h: 64px;
     }
+
+    /* ── RESET & BASE ──────────────────────────────────── */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      height: 100%;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── APP SHELL ─────────────────────────────────────── */
     #app {
-      max-width: 480px;
-      margin: auto;
-      height: 100vh;
+      max-width: 430px;
+      margin: 0 auto;
+      height: 100dvh;
+      /* dynamic viewport height */
       display: flex;
       flex-direction: column;
-      background: #fff;
-      box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
-      border-radius: 16px;
+      background: var(--surface);
+      box-shadow: 0 0 60px rgba(79, 70, 229, .12);
+      position: relative;
       overflow: hidden;
-      padding-bottom: 58px; /* space for footer */
     }
 
-    /* Fixed top app bar */
-    header#appBar {
-      background-color: #0d6efd;
-      color: white;
-      padding: 1rem 1.25rem;
-      font-size: 1.5rem;
-      font-weight: 700;
-      text-align: center;
-      user-select: none;
+    /* ── HEADER ────────────────────────────────────────── */
+    #appBar {
       flex-shrink: 0;
-      box-shadow: 0 2px 6px rgb(0 0 0 / 0.15);
+      height: var(--header-h);
+      background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 60%, #1e1b4b 100%);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.25rem;
+      position: relative;
+      z-index: 10;
+      box-shadow: 0 4px 20px rgba(79, 70, 229, .35);
     }
 
-    /* Content area scrollable */
+    #appBar::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='40' cy='40' r='38' fill='none' stroke='rgba(255,255,255,.06)' stroke-width='1'/%3E%3C/svg%3E") center/200px repeat;
+      pointer-events: none;
+    }
+
+    .app-bar-title {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .app-bar-title .line1 {
+      font-size: .7rem;
+      font-weight: 500;
+      color: rgba(255, 255, 255, .65);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .app-bar-title .line2 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -.01em;
+    }
+
+    .app-bar-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      color: #fff;
+      border: 2px solid rgba(255, 255, 255, .3);
+      flex-shrink: 0;
+    }
+
+    /* ── MAIN SCROLLABLE AREA ──────────────────────────── */
     main {
       flex: 1 1 auto;
       overflow-y: auto;
-      padding: 1rem 1.25rem;
-      background: #f8f9fa;
-      position: relative;
+      overscroll-behavior: contain;
+      padding: 1.1rem 1rem calc(var(--nav-h) + var(--footer-h) + .5rem);
+      background: var(--bg);
     }
 
-    /* Card for content */
-    .page-card {
-      background: white;
-      border-radius: 16px;
-      box-shadow: 0 4px 8px rgb(0 0 0 / 0.06);
-      padding: 1.5rem;
-      height: 100%;
+    main::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    main::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 2px;
+    }
+
+    /* ── PAGES ─────────────────────────────────────────── */
+    section.page {
+      display: none;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    section.page.active {
+      display: flex;
+    }
+
+    /* ── ADD PAGE ──────────────────────────────────────── */
+    .hero-card {
+      background: linear-gradient(135deg, var(--brand) 0%, var(--accent) 100%);
+      border-radius: var(--radius-lg);
+      padding: 2rem 1.5rem 1.5rem;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .hero-card::before {
+      content: '';
+      position: absolute;
+      top: -40px;
+      right: -40px;
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .1);
+    }
+
+    .hero-card::after {
+      content: '';
+      position: absolute;
+      bottom: -60px;
+      left: -20px;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .06);
+    }
+
+    .hero-card .hero-icon {
+      font-size: 2.8rem;
+      margin-bottom: .75rem;
+      display: block;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-card h2 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      line-height: 1.25;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-card p {
+      font-size: .85rem;
+      color: rgba(255, 255, 255, .8);
+      margin-top: .35rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-card .cta-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: .5rem;
+      margin-top: 1.25rem;
+      background: #fff;
+      color: var(--brand);
+      font-size: .95rem;
+      font-weight: 700;
+      padding: .85rem 1.5rem;
+      border-radius: 50px;
+      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, .2);
+      transition: transform .15s, box-shadow .15s;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-card .cta-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, .25);
+    }
+
+    .hero-card .cta-btn:active {
+      transform: scale(.97);
+    }
+
+    /* info card */
+    .info-card {
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      padding: 1.1rem 1.25rem;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      gap: .85rem;
+    }
+
+    .info-card .ic-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-sm);
+      background: #eef2ff;
+      color: var(--brand);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    .info-card .ic-body {
+      flex: 1;
+    }
+
+    .info-card .ic-label {
+      font-size: .7rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-bottom: .15rem;
+    }
+
+    .info-card .ic-value {
+      font-size: .93rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    /* ── REPORT PAGE ───────────────────────────────────── */
+    .report-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: .25rem;
+    }
+
+    .report-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .refresh-btn {
+      display: flex;
+      align-items: center;
+      gap: .35rem;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      color: var(--brand);
+      font-size: .78rem;
+      font-weight: 600;
+      padding: .45rem .9rem;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+    .refresh-btn:hover {
+      background: #eef2ff;
+      border-color: var(--brand-light);
+    }
+
+    .refresh-btn:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    /* loading skeleton */
+    #loadingMsg {
+      display: none;
+      flex-direction: column;
+      gap: .75rem;
+      padding: .5rem 0;
+    }
+
+    #loadingMsg.visible {
+      display: flex !important;
+    }
+
+    .skeleton {
+      background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+      border-radius: var(--radius-sm);
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: 200% 0
+      }
+
+      100% {
+        background-position: -200% 0
+      }
+    }
+
+    /* year groups */
+    #yearGroupsContainer {
       display: flex;
       flex-direction: column;
+      gap: 1rem;
     }
 
-    /* Bottom Tab Bar */
-    nav#bottomNav {
+    .year-section {
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+    }
+
+    .year-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+      color: #fff;
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      padding: .25rem .65rem;
+      border-radius: 50px;
+      margin-bottom: .75rem;
+    }
+
+    .month-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .45rem;
+    }
+
+    .month-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 52px;
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      color: var(--text-muted);
+      font-size: .8rem;
+      font-weight: 600;
+      padding: .45rem .7rem;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all .18s;
+      user-select: none;
+    }
+
+    .month-chip:hover {
+      background: #eef2ff;
+      border-color: var(--brand-light);
+      color: var(--brand);
+      transform: translateY(-1px);
+    }
+
+    .month-chip.active {
+      background: linear-gradient(135deg, var(--brand), var(--accent));
+      border-color: transparent;
+      color: #fff;
+      box-shadow: 0 3px 10px rgba(79, 70, 229, .35);
+      transform: translateY(-1px);
+    }
+
+    /* report area */
+    #reportArea {
+      margin-top: .25rem;
+    }
+
+    .result-card {
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      padding: 1rem 1.1rem;
+      border-left: 4px solid var(--success);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      gap: .8rem;
+      animation: slideUp .3s ease;
+    }
+
+    .result-card.error {
+      border-color: var(--danger);
+    }
+
+    .result-card.warn {
+      border-color: var(--warn);
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(8px)
+      }
+
+      to {
+        opacity: 1;
+        transform: none
+      }
+    }
+
+    .result-card .rc-icon {
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .result-card .rc-body {
+      flex: 1;
+    }
+
+    .result-card .rc-title {
+      font-size: .9rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .result-card .rc-sub {
+      font-size: .78rem;
+      color: var(--text-muted);
+      margin-top: .1rem;
+    }
+
+    /* ── BOTTOM NAV ────────────────────────────────────── */
+    #bottomNav {
       position: fixed;
-      bottom: 46px; /* above footer */
+      bottom: var(--footer-h);
       left: 50%;
       transform: translateX(-50%);
-      max-width: 480px;
+      max-width: 430px;
       width: 100%;
-      background: white;
-      box-shadow: 0 -2px 10px rgb(0 0 0 / 0.1);
+      background: rgba(255, 255, 255, .92);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-top: 1px solid var(--border);
       display: flex;
-      justify-content: space-around;
-      padding: 0.5rem 0;
-      user-select: none;
-      z-index: 1095;
-      border-top-left-radius: 16px;
-      border-top-right-radius: 16px;
+      z-index: 100;
+      height: var(--nav-h);
     }
-    nav#bottomNav button {
-      background: transparent;
+
+    .nav-btn {
+      flex: 1;
+      background: none;
       border: none;
-      flex-grow: 1;
-      font-size: 0.9rem;
-      padding: 0.5rem 0;
       display: flex;
       flex-direction: column;
       align-items: center;
-      color: #6c757d;
+      justify-content: center;
+      gap: .2rem;
       cursor: pointer;
-      transition: color 0.3s ease;
-    }
-    nav#bottomNav button svg {
-      width: 24px;
-      height: 24px;
-      margin-bottom: 0.25rem;
-      stroke-width: 1.5;
-    }
-    nav#bottomNav button.active,
-    nav#bottomNav button:hover {
-      color: #0d6efd;
+      color: var(--text-muted);
+      font-size: .68rem;
+      font-weight: 600;
+      letter-spacing: .02em;
+      transition: color .2s;
+      position: relative;
+      padding: 0;
     }
 
-    /* Hide pages by default */
-    section.page {
+    .nav-btn i {
+      font-size: 1.5rem;
+      transition: transform .2s;
+    }
+
+    .nav-btn.active {
+      color: var(--brand);
+    }
+
+    .nav-btn.active i {
+      transform: scale(1.1);
+    }
+
+    .nav-btn.active::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 36px;
+      height: 3px;
+      background: var(--brand);
+      border-radius: 0 0 4px 4px;
+    }
+
+    .nav-btn .nav-dot {
       display: none;
-      flex: 1 1 auto;
-    }
-    section.page.active {
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* Buttons full width and spaced nicely */
-    .btn-primary, .btn-success, .btn-outline-info {
-      width: 100%;
-      font-size: 1.15rem;
-      padding: 1rem 0.5rem;
-      border-radius: 12px;
-      box-shadow: 0 2px 6px rgb(13 110 253 / 0.3);
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--brand);
+      position: absolute;
+      top: 8px;
+      right: calc(50% - 18px);
     }
 
-    /* Scrollable report area */
-    #reportArea {
-      flex: 1 1 auto;
-      overflow-y: auto;
-      margin-top: 1rem;
-    }
-
-    /* Month-Year Menu Bar inside report */
-    #monthYearMenuBar {
-      background-color: #f8f9fa;
-      margin-top: 1rem;
-    }
-    #buttonContainer {
-      display: flex;
-      gap: 0.5rem;
-      overflow-x: auto;
-      padding-bottom: 0.5rem;
-      -webkit-overflow-scrolling: touch;
-      white-space: nowrap;
-    }
-    #buttonContainer button {
-      flex-grow: 0 !important;
-      flex-basis: auto !important;
-      display: inline-block;
-      min-width: 100px;
-      white-space: nowrap;
-    }
-
-    /* Footer styles */
+    /* ── FOOTER ────────────────────────────────────────── */
     #footerBar {
       position: fixed;
       bottom: 0;
       left: 50%;
       transform: translateX(-50%);
-      max-width: 480px;
+      max-width: 430px;
       width: 100%;
-      height: 46px;
-      background: #0d6efd;
-      color: #fff;
-      font-size: 0.96rem;
-      font-weight: 600;
+      height: var(--footer-h);
+      background: linear-gradient(90deg, var(--brand-dark), var(--brand));
+      color: rgba(255, 255, 255, .85);
+      font-size: .65rem;
+      font-weight: 500;
+      letter-spacing: .04em;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 -2px 10px rgb(0 0 0 / 0.12);
-      z-index: 1100;
-      border-bottom-left-radius: 16px;
-      border-bottom-right-radius: 16px;
-      user-select: none;
+      z-index: 101;
     }
 
-    /* Responsive tweaks */
-    @media (max-width: 360px) {
-      .page-card {
-        padding: 1rem;
-      }
+    /* ── UTILITY ───────────────────────────────────────── */
+    .section-title {
+      font-size: .7rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: .6rem;
+      padding-left: .1rem;
     }
   </style>
 </head>
-<body>
-  <div id="app" role="main" aria-label="Work Update and Report Application">
 
+<body>
+  <div id="app" role="main">
+
+    <!-- ── HEADER ─────────────────────────────────────── -->
     <header id="appBar" role="banner">
-      Work Update App
+      <div class="app-bar-title">
+        <span class="line1">Manbhum Ananda Ashram</span>
+        <span class="line2">Work Update App</span>
+      </div>
+      <div class="app-bar-avatar">
+        <i class="bi bi-person-fill"></i>
+      </div>
     </header>
 
+    <!-- ── MAIN ───────────────────────────────────────── -->
     <main>
-      <!-- Add Work Update Page -->
+
+      <!-- ADD PAGE -->
       <section id="page-add" class="page active" tabindex="0" role="region" aria-label="Add Work Update">
-        <div class="page-card">
-          <a
-            href="https://forms.gle/8TbY5fmMs9rPeiQx7"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="btn btn-primary"
-            aria-label="Open form to add work update"
-            >➕ Add Work Update</a>
+
+        <!-- hero CTA -->
+        <div class="hero-card">
+          <span class="hero-icon">📝</span>
+          <h2>Log Today's Work Activity</h2>
+          <p>Fill in your visit details, contacts &amp; outcomes for the day.</p>
+          <a href="https://forms.gle/8TbY5fmMs9rPeiQx7" target="_blank" rel="noopener noreferrer" class="cta-btn"
+            aria-label="Open Google Form to add work update">
+            <i class="bi bi-plus-circle-fill"></i> Add Work Update
+          </a>
         </div>
+
+        <!-- info cards -->
+        <p class="section-title">Your Details</p>
+
+        <div class="info-card">
+          <div class="ic-icon"><i class="bi bi-person-badge-fill"></i></div>
+          <div class="ic-body">
+            <div class="ic-label">Name</div>
+            <div class="ic-value">Toton Shit</div>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="ic-icon" style="background:#ecfdf5;color:var(--success)"><i class="bi bi-briefcase-fill"></i>
+          </div>
+          <div class="ic-body">
+            <div class="ic-label">Designation</div>
+            <div class="ic-value">Block Health Worker (Jamboni)</div>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="ic-icon" style="background:#fff7ed;color:#f97316"><i class="bi bi-building-fill-add"></i></div>
+          <div class="ic-body">
+            <div class="ic-label">Project</div>
+            <div class="ic-value">High Impact Rural Eye Health — Jhargram</div>
+          </div>
+        </div>
+
       </section>
 
-      <!-- Generate Report Page -->
+      <!-- REPORT PAGE -->
       <section id="page-report" class="page" tabindex="0" role="region" aria-label="Generate Report">
-        <div class="page-card d-flex flex-column">
-          <div id="csvUploader" aria-label="CSV Report Upload Section">
-            <h5 class="text-center fw-bold mb-3">Step 1: Download & Upload CSV Report</h5>
 
-            <div class="mb-3">
-              <a
-                href="https://docs.google.com/spreadsheets/d/e/2PACX-1vSIamlRZC480-QO7RE9zzhODFeMoEPMg4gZhjGCUUxhXZ_RRlfeffk66K7UBxNUATNPWV20hD8WJKMQ/pub?gid=1006678844&single=true&output=csv"
-                target="_blank"
-                class="btn btn-primary"
-                aria-label="Download CSV report"
-                >📥 Download CSV</a>
-            </div>
-
-            <div class="mb-3">
-              <label for="csvFile" class="form-label fw-semibold">Upload Downloaded CSV File:</label>
-              <input
-                type="file"
-                id="csvFile"
-                accept=".csv"
-                class="form-control"
-                aria-required="true"
-                aria-describedby="csvFileHelp"
-              />
-              <div id="csvFileHelp" class="form-text">
-                Please upload the CSV file you downloaded above.
-              </div>
-            </div>
-
-            <button id="processBtn" class="btn btn-success mb-3">✅ Next: Process File</button>
-
-            <a
-              href="https://docs.google.com/spreadsheets/d/1coypbNfY9aaIx8dgJJhRU60q82IwjG-IMal531Q39RY/edit?usp=sharing"
-              target="_blank"
-              rel="noopener noreferrer"
-              id="viewSourceBtn"
-              class="btn btn-outline-info"
-              aria-label="View source data in Google Sheets"
-              >👁️ View Source Data</a>
-          </div>
-
-          <!-- Month-Year buttons moved here as a horizontal scrollable bar -->
-          <nav id="monthYearMenuBar" aria-label="Month and Year Report Selection">
-            <div id="buttonContainer" role="list"></div>
-          </nav>
-
-          <div id="reportArea" aria-live="polite" aria-atomic="true" class="mt-3 flex-grow-1"></div>
+        <div class="report-header-row">
+          <span class="report-title">📋 Monthly Reports</span>
+          <button id="refreshBtn" class="refresh-btn" type="button" aria-label="Refresh data">
+            <i class="bi bi-arrow-clockwise"></i> Refresh
+          </button>
         </div>
+
+        <!-- skeleton loader -->
+        <div id="loadingMsg" role="status" aria-live="polite">
+          <div class="skeleton" style="height:90px"></div>
+          <div class="skeleton" style="height:90px"></div>
+          <div class="skeleton" style="height:60px"></div>
+        </div>
+
+        <!-- year-grouped month chips -->
+        <div id="yearGroupsContainer" aria-label="Reports grouped by year"></div>
+
+        <!-- result area -->
+        <div id="reportArea" aria-live="polite" aria-atomic="true"></div>
+
       </section>
     </main>
 
-    <!-- Bottom Tab Bar -->
+    <!-- ── BOTTOM NAV ──────────────────────────────────── -->
     <nav id="bottomNav" role="navigation" aria-label="Primary">
-      <button id="btnAdd" class="active" aria-current="page" aria-label="Navigate to Add Work Update page" type="button">
-        <svg stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <line x1="12" y1="5" x2="12" y2="19" />
-          <line x1="5" y1="12" x2="19" y2="12" />
-        </svg>
+      <button id="btnAdd" class="nav-btn active" aria-current="page" aria-label="Add Work Update" type="button">
+        <i class="bi bi-plus-circle-fill"></i>
         Add
       </button>
-      <button id="btnReport" aria-label="Navigate to Generate Report page" type="button">
-        <svg stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <circle cx="12" cy="12" r="10" />
-          <line x1="12" y1="16" x2="12" y2="12" />
-          <line x1="12" y1="8" x2="12" y2="8" />
-        </svg>
+      <button id="btnReport" class="nav-btn" aria-label="Generate Report" type="button">
+        <i class="bi bi-file-earmark-bar-graph-fill"></i>
         Report
       </button>
     </nav>
 
-    <!-- Fixed Footer -->
+    <!-- ── FOOTER ─────────────────────────────────────── -->
     <footer id="footerBar" role="contentinfo">
-      © 2025 Riju Karmakar — All rights reserved
+      © 2025 Riju Karmakar · All rights reserved
     </footer>
 
   </div>
 
-  <!-- Bootstrap JS bundle -->
+  <!-- libs -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- External libraries for CSV parsing and PDF generation -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
   <script>
     (() => {
+      /* ── config ──────────────────────────────────── */
+      const SHEET_CSV =
+        "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIamlRZC480-QO7RE9zzhODFeMoEPMg4gZhjGCUUxhXZ_RRlfeffk66K7UBxNUATNPWV20hD8WJKMQ/pub?gid=1006678844&single=true&output=csv";
+      const CORS_PROXY = "https://corsproxy.io/?url=";
+      const CSV_URL = CORS_PROXY + encodeURIComponent(SHEET_CSV);
+
+      /* ── refs ────────────────────────────────────── */
       const btnAdd = document.getElementById("btnAdd");
       const btnReport = document.getElementById("btnReport");
       const pageAdd = document.getElementById("page-add");
       const pageReport = document.getElementById("page-report");
-
-      const csvFileInput = document.getElementById("csvFile");
-      const processBtn = document.getElementById("processBtn");
-      const buttonContainer = document.getElementById("buttonContainer");
+      const yearGroupsContainer = document.getElementById("yearGroupsContainer");
       const reportArea = document.getElementById("reportArea");
-
-      btnAdd.addEventListener("click", () => showPage("add"));
-      btnReport.addEventListener("click", () => showPage("report"));
-
-      function showPage(page) {
-        if (page === "add") {
-          pageAdd.classList.add("active");
-          pageAdd.focus();
-          pageReport.classList.remove("active");
-          btnAdd.classList.add("active");
-          btnAdd.setAttribute("aria-current", "page");
-          btnReport.classList.remove("active");
-          btnReport.removeAttribute("aria-current");
-          clearReportSection();
-        } else if (page === "report") {
-          pageAdd.classList.remove("active");
-          pageReport.classList.add("active");
-          pageReport.focus();
-          btnReport.classList.add("active");
-          btnReport.setAttribute("aria-current", "page");
-          btnAdd.classList.remove("active");
-          btnAdd.removeAttribute("aria-current");
-        }
-      }
-
-      function clearReportSection() {
-        buttonContainer.innerHTML = "";
-        reportArea.innerHTML = "";
-        csvFileInput.value = "";
-      }
+      const loadingMsg = document.getElementById("loadingMsg");
+      const refreshBtn = document.getElementById("refreshBtn");
 
       let globalData = [];
+      let dataLoaded = false;
 
-      processBtn.addEventListener("click", () => {
-        if (!csvFileInput.files.length) {
-          alert("Please upload a CSV file first.");
-          return;
-        }
+      /* ── navigation ──────────────────────────────── */
+      btnAdd.addEventListener("click", () => showPage("add"));
+      btnReport.addEventListener("click", () => { showPage("report"); if (!dataLoaded) fetchAndProcess(); });
+      refreshBtn.addEventListener("click", () => { dataLoaded = false; fetchAndProcess(); });
 
-        const file = csvFileInput.files[0];
-        Papa.parse(file, {
-          header: true,
-          skipEmptyLines: true,
-          transformHeader: (header) => header.trim(),
-          complete: (results) => {
-            const cleaned = results.data.filter(
-              (row) => row["Month"] && row["Year"]
-            );
-            if (!cleaned.length) {
-              alert("No valid data found with Month and Year.");
-              return;
-            }
-
-            globalData = cleaned;
-            populateMonthButtons();
-            reportArea.innerHTML = "";
-          },
-          error: (error) => {
-            alert("Error parsing CSV: " + error.message);
-          },
-        });
-      });
-
-      function populateMonthButtons() {
-        const monthYearSet = new Set();
-
-        globalData.forEach((row) => {
-          const month = row["Month"]?.trim();
-          const year = row["Year"]?.trim();
-          if (month && year) {
-            monthYearSet.add(`${month}-${year}`);
-          }
-        });
-
-        buttonContainer.innerHTML = "";
-
-        monthYearSet.forEach((key) => {
-          const btn = document.createElement("button");
-          btn.className = "btn btn-outline-primary";
-          btn.type = "button";
-          btn.textContent = key;
-          btn.setAttribute("role", "listitem");
-          btn.addEventListener("click", () => {
-            const [month, year] = key.split("-");
-            const filtered = globalData.filter(
-              (row) =>
-                row["Month"]?.trim() === month && row["Year"]?.trim() === year
-            );
-            generatePDF(filtered, key);
-          });
-          buttonContainer.appendChild(btn);
-        });
-
-        alert(`🎉 Generated buttons for ${monthYearSet.size} month(s).`);
+      function showPage(page) {
+        const isAdd = page === "add";
+        pageAdd.classList.toggle("active", isAdd);
+        pageReport.classList.toggle("active", !isAdd);
+        btnAdd.classList.toggle("active", isAdd);
+        btnReport.classList.toggle("active", !isAdd);
+        btnAdd.toggleAttribute("aria-current", isAdd);
+        btnReport.toggleAttribute("aria-current", !isAdd);
+        if (isAdd) { pageAdd.focus(); }
+        else { pageReport.focus(); }
       }
 
+      /* ── loading state ───────────────────────────── */
+      function setLoading(on) {
+        loadingMsg.classList.toggle("visible", on);
+        refreshBtn.disabled = on;
+      }
+
+      /* ── fetch ───────────────────────────────────── */
+      function fetchAndProcess() {
+        setLoading(true);
+        yearGroupsContainer.innerHTML = "";
+        reportArea.innerHTML = "";
+
+        const url = CSV_URL + "&cachebust=" + Date.now();
+
+        Papa.parse(url, {
+          download: true,
+          header: true,
+          skipEmptyLines: true,
+          transformHeader: h => h.trim(),
+          complete(results) {
+            setLoading(false);
+            const cleaned = results.data.filter(r => r["Month"] && r["Year"]);
+            if (!cleaned.length) {
+              showResult("warn", "⚠️", "No data found", "Your Google Sheet appears to be empty.");
+              return;
+            }
+            globalData = cleaned;
+            dataLoaded = true;
+            buildYearGroups();
+          },
+          error(err) {
+            setLoading(false);
+            showResult("error", "❌", "Could not load data", err.message || "Network error — check your connection.");
+          },
+        });
+      }
+
+      /* ── build year → month UI ───────────────────── */
+      const MONTH_ORDER = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+      ];
+
+      function buildYearGroups() {
+        const yearMap = {};
+        globalData.forEach(row => {
+          const month = row["Month"]?.trim();
+          const year = row["Year"]?.trim();
+          if (!month || !year) return;
+          (yearMap[year] = yearMap[year] || new Set()).add(month);
+        });
+
+        const years = Object.keys(yearMap).sort((a, b) => Number(b) - Number(a));
+        yearGroupsContainer.innerHTML = "";
+
+        years.forEach(year => {
+          const months = [...yearMap[year]].sort(
+            (a, b) => MONTH_ORDER.indexOf(a) - MONTH_ORDER.indexOf(b)
+          );
+
+          const section = document.createElement("div");
+          section.className = "year-section";
+
+          // year badge
+          const badge = document.createElement("div");
+          badge.className = "year-badge";
+          badge.innerHTML = `<i class="bi bi-calendar3"></i> ${year}`;
+          section.appendChild(badge);
+
+          // chips row
+          const chips = document.createElement("div");
+          chips.className = "month-chips";
+
+          months.forEach(month => {
+            const key = `${month}-${year}`;
+            const chip = document.createElement("button");
+            chip.className = "month-chip";
+            chip.type = "button";
+            chip.textContent = month.slice(0, 3);
+            chip.title = key;
+            chip.addEventListener("click", () => {
+              yearGroupsContainer.querySelectorAll(".month-chip").forEach(c => c.classList.remove("active"));
+              chip.classList.add("active");
+              const filtered = globalData.filter(
+                r => r["Month"]?.trim() === month && r["Year"]?.trim() === year
+              );
+              generatePDF(filtered, key);
+            });
+            chips.appendChild(chip);
+          });
+
+          section.appendChild(chips);
+          yearGroupsContainer.appendChild(section);
+        });
+      }
+
+      /* ── result card ─────────────────────────────── */
+      function showResult(type, icon, title, sub) {
+        reportArea.innerHTML = `
+      <div class="result-card ${type}">
+        <span class="rc-icon">${icon}</span>
+        <div class="rc-body">
+          <div class="rc-title">${title}</div>
+          <div class="rc-sub">${sub}</div>
+        </div>
+      </div>`;
+        reportArea.focus();
+      }
+
+      /* ── PDF generation ──────────────────────────── */
       async function generatePDF(filteredData, selectedMonthYear) {
         const { jsPDF } = window.jspdf;
-        const doc = new jsPDF({
-          orientation: "landscape",
-          unit: "mm",
-          format: "a4",
-        });
+        const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+        const W = doc.internal.pageSize.getWidth();
 
-        const pageWidth = doc.internal.pageSize.getWidth();
+        doc.setFontSize(12); doc.setFont("helvetica", "bold");
+        doc.text("MANBHUM ANANDA ASHRAM NITYANANDA TRUST", W / 2, 15, { align: "center" });
+        doc.text("High Impact Rural Eye Health Project, Jhargram", W / 2, 22, { align: "center" });
+        doc.setLineWidth(0.3); doc.line(10, 26, W - 10, 26);
 
-        doc.setFontSize(12);
-        doc.setFont("helvetica", "bold");
-        const title = "MANBHUM ANANDA ASHRAM NITYANANDA TRUST";
-        const subtitle = "High Impact Rural Eye Health Project, Jhargram";
-        doc.text(title, pageWidth / 2, 15, { align: "center" });
-        doc.text(subtitle, pageWidth / 2, 22, { align: "center" });
-
-        doc.setLineWidth(0.3);
-        doc.line(10, 26, pageWidth - 10, 26);
-
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(11);
-        doc.text(`For the month of ${selectedMonthYear}`, pageWidth / 2, 33, {
-          align: "center",
-        });
+        doc.setFont("helvetica", "normal"); doc.setFontSize(11);
+        doc.text(`For the month of ${selectedMonthYear}`, W / 2, 33, { align: "center" });
 
         doc.setFontSize(10);
         doc.text("Name: Toton Shit", 10, 40);
-        doc.text(
-          "Designation: Block Health Worker (Jamboni)",
-          pageWidth - 10,
-          40,
-          { align: "right" }
-        );
-
-        const headers = [
-          [
-            "Sl",
-            "Date of Visit",
-            "Place Visited/Contacted",
-            "Person Met/Contacted",
-            "Topic Discussed",
-            "Outcome / Result",
-            "Follow Up",
-          ],
-        ];
-
-        const rows = filteredData.map((row, index) => [
-          index + 1,
-          row["Date of Visit"] || "",
-          row["Place Visited/ Contacted"] || "",
-          row["Person Met/ Contacted"] || "",
-          row["Topic Discussed"] || "",
-          row["Outcome / Result"] || "",
-          row["Follow Up"] || "",
-        ]);
+        doc.text("Designation: Block Health Worker (Jamboni)", W - 10, 40, { align: "right" });
 
         doc.autoTable({
-          head: headers,
-          body: rows,
+          head: [["Sl", "Date of Visit", "Place Visited/Contacted", "Person Met/Contacted", "Topic Discussed", "Outcome / Result", "Follow Up"]],
+          body: filteredData.map((row, i) => [
+            i + 1,
+            row["Date of Visit"] || "",
+            row["Place Visited/ Contacted"] || "",
+            row["Person Met/ Contacted"] || "",
+            row["Topic Discussed"] || "",
+            row["Outcome / Result"] || "",
+            row["Follow Up"] || "",
+          ]),
           startY: 47,
           theme: "grid",
           styles: { fontSize: 8, cellPadding: 2 },
-          headStyles: {
-            fillColor: [220, 220, 220],
-            textColor: 0,
-            fontStyle: "bold",
-          },
+          headStyles: { fillColor: [79, 70, 229], textColor: 255, fontStyle: "bold" },
           columnStyles: {
-            0: { cellWidth: 10 },
-            1: { cellWidth: 30 },
-            2: { cellWidth: 45 },
-            3: { cellWidth: 45 },
-            4: { cellWidth: 55 },
-            5: { cellWidth: 55 },
-            6: { cellWidth: 30 },
+            0: { cellWidth: 10 }, 1: { cellWidth: 30 },
+            2: { cellWidth: 45 }, 3: { cellWidth: 45 },
+            4: { cellWidth: 55 }, 5: { cellWidth: 55 }, 6: { cellWidth: 30 },
           },
         });
 
         const finalY = doc.lastAutoTable.finalY;
         doc.text("Signature of Staff", 10, finalY + 20);
-        doc.text("Verified by", pageWidth - 10, finalY + 20, { align: "right" });
+        doc.text("Verified by", W - 10, finalY + 20, { align: "right" });
 
-        doc.save(`Travel_Report_${selectedMonthYear}.pdf`);
+        // Blob URL download — works from file:// origin
+        const filename = `Travel_Report_${selectedMonthYear}.pdf`;
+        const blob = doc.output("blob");
+        const blobUrl = URL.createObjectURL(blob);
 
-        reportArea.innerHTML = `<div class="alert alert-success" role="alert">✅ PDF generated for <strong>${selectedMonthYear}</strong>. Check your downloads.</div>`;
+        // Try programmatic click download
+        const a = document.createElement("a");
+        a.href = blobUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        // Show result with a manual download link as fallback
+        reportArea.innerHTML = `
+          <div class="result-card success">
+            <span class="rc-icon">✅</span>
+            <div class="rc-body">
+              <div class="rc-title">PDF ready — ${selectedMonthYear}</div>
+              <div class="rc-sub">If download didn't start automatically, tap the button below.</div>
+              <a href="${blobUrl}" download="${filename}"
+                 style="display:inline-flex;align-items:center;gap:.4rem;margin-top:.6rem;
+                        background:var(--brand);color:#fff;font-size:.8rem;font-weight:700;
+                        padding:.45rem 1rem;border-radius:50px;text-decoration:none;">
+                <i class="bi bi-download"></i> Download PDF
+              </a>
+            </div>
+          </div>`;
         reportArea.focus();
       }
 
-      // Initialize
+      // boot
       showPage("add");
     })();
   </script>
 </body>
+
 </html>
