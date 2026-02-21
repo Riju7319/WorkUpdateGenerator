@@ -700,8 +700,12 @@
       /* ── config ──────────────────────────────────── */
       const SHEET_CSV =
         "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIamlRZC480-QO7RE9zzhODFeMoEPMg4gZhjGCUUxhXZ_RRlfeffk66K7UBxNUATNPWV20hD8WJKMQ/pub?gid=1006678844&single=true&output=csv";
-      const CORS_PROXY = "https://corsproxy.io/?url=";
-      const CSV_URL = CORS_PROXY + encodeURIComponent(SHEET_CSV);
+      // Use CORS proxy only when running locally (file:// has null origin).
+      // On Netlify / any real server, Google Sheets CSV allows direct CORS access.
+      const isLocal = location.protocol === "file:";
+      const CSV_URL = isLocal
+        ? "https://corsproxy.io/?url=" + encodeURIComponent(SHEET_CSV)
+        : SHEET_CSV;
 
       /* ── refs ────────────────────────────────────── */
       const btnAdd = document.getElementById("btnAdd");
